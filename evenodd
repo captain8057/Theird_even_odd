@@ -1,5 +1,4 @@
-// evenodd.cpp : Defines the entry point for the console application.
-//
+//توليد مصفوفة بشكل عشوائي وترتيب عناصرها عن طريق خوارزمية evenodd
 
 #include "stdafx.h"
 #include <mpi.h>
@@ -11,12 +10,12 @@
 #include <time.h>
 
 using namespace std;
-
+//تعريف تابع التبديل بين العناصر 
 int swap(int *num, int i, int j);
 
 int main(int argc, char * argv[]) {
 	
-	
+	//تعريف متحولات مساعدة للعمل 
 	int size =128;
 	int *array_in = (int *)malloc(sizeof(int)*size); // array in
 	int *array_out = (int *)malloc(sizeof(int)*size); // array out
@@ -27,35 +26,36 @@ int main(int argc, char * argv[]) {
 	double totaltime;
 	char hostname[MPI_MAX_PROCESSOR_NAME];
 
-	MPI_Init(&argc, &argv); // initialize MPI عملية تهيئة ال MPi  
+	MPI_Init(&argc, &argv); // تهيئة للمكتبة للعمل
 	MPI_Comm_size(MPI_COMM_WORLD, &numtasks); // get number of tasks يقوم بارجاع قيمة هي عدد العمليات الموجودة في البيئة 
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank); // get my rank يقوم بارجاق قيمة حسب الايدي او الرنك للبروسسر الحالي
 	MPI_Get_processor_name(hostname, &len); // this one is obvious
 
-											//Generate random array
+	//حلقة لتوليد مصفوفة عشوائية 										
 	for (int i = 0; i < size; i++) {
 		array_in[i] = ((int)rand()) % 100;
 	//	printf("%d ", array_in[i]);
 	}
-
+        //حساب الوقت المستغرق في العملية 
 	start = MPI_Wtime();
 
 	rem = size % numtasks;
 	local_size = size / numtasks;
 	local_size_max = local_size;
-	if (local_size % 2 == 1) { // odd numbers in each processor
+	if (local_size % 2 == 1) { // الاعداد الفردية في كل خيط
 		local_size += 1;
 		local_size_max = local_size;
 	}
-	else { // even numbers in each processor
+	else { // الاعداد الزوجية في كل خيط 
 		if (rank == numtasks - 1) {
 			local_size_max = local_size + rem;
 		}
 	}
-
+         //طباعة رقم الخيط الذي اوجد الاعداد ورتبته 
 	printf("\nnumber of tasks= %d my rank= %d local_size= %d running on %s \nLocal array: ", numtasks, rank, local_size_max, hostname);
-
-	int *local_array = (int *)malloc(sizeof(int)*local_size);  // local array
+        
+         //إيجاد المصفوفة وطباعتها قبل الترتيب
+	int *local_array = (int *)malloc(sizeof(int)*local_size);  
 	for (int i = 0; i < local_size_max; i++) {
 		MPI_Scatter(&array_in, local_size_max, MPI_INT, local_array, local_size_max, MPI_INT, 0, MPI_COMM_WORLD);
 		if (local_size*rank + i < size) {
