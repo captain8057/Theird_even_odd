@@ -17,19 +17,23 @@ int main(int argc, char * argv[]) {
 	
 	//تعريف متحولات مساعدة للعمل 
 	int size =128;
-	int *array_in = (int *)malloc(sizeof(int)*size); // array in
-	int *array_out = (int *)malloc(sizeof(int)*size); // array out
+	int *array_in = (int *)malloc(sizeof(int)*size); 
+	int *array_out = (int *)malloc(sizeof(int)*size); 
 	int local_size, local_size_max, rem;
 	int recv_right, send_left, send_right, recv_left;
 	int numtasks, rank, len;
 	double start, finish;
 	double totaltime;
 	char hostname[MPI_MAX_PROCESSOR_NAME];
-
-	MPI_Init(&argc, &argv); // تهيئة للمكتبة للعمل
-	MPI_Comm_size(MPI_COMM_WORLD, &numtasks); // get number of tasks يقوم بارجاع قيمة هي عدد العمليات الموجودة في البيئة 
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank); // get my rank يقوم بارجاق قيمة حسب الايدي او الرنك للبروسسر الحالي
-	MPI_Get_processor_name(hostname, &len); // this one is obvious
+	
+	// تهيئة للمكتبة للعمل
+	MPI_Init(&argc, &argv); 
+	// get number of tasks يقوم بارجاع قيمة هي عدد العمليات الموجودة في البيئة 
+	MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
+	// get my rank يقوم بارجاق قيمة حسب الايدي او الرنك للبروسسر الحالي
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank); 
+	// this one is obvious
+	MPI_Get_processor_name(hostname, &len); 
 
 	//حلقة لتوليد مصفوفة عشوائية 										
 	for (int i = 0; i < size; i++) {
@@ -62,7 +66,7 @@ int main(int argc, char * argv[]) {
 			local_array[i] = array_in[local_size*rank + i];
 		}
 		else { // padding
-			local_array[i] = 100; //1000 actually should be the max of array
+			local_array[i] = 100; //1000 يجب أن يكون الحد الأقصى للمصفوفة
 		}
 		printf("%d ", local_array[i]);
 	}
